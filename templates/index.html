@@ -129,7 +129,8 @@
         }
 
         .cooldown-btn.on-cooldown {
-            cursor: not-allowed;
+            /* cursor: not-allowed; */
+            user-select: none;
         }
 
         .cooldown-btn.on-cooldown img {
@@ -609,22 +610,30 @@
         const cooldownIntervals = new Map();
 
         function startCooldown(button) {
+            const textElement = button.querySelector('.cooldown-text');
+
             if (button.classList.contains('on-cooldown')) {
+                let currentCooldown = parseInt(button.dataset.currentCooldown) || 30;
+                button.dataset.currentCooldown = currentCooldown - 2;
+
+                textElement.textContent = currentCooldown;
                 return;
             }
 
-            const cooldownTime = parseInt(button.dataset.cooldown) || 30;
             button.classList.add('on-cooldown');
-            const textElement = button.querySelector('.cooldown-text');
-            let timeLeft = cooldownTime;
 
-            textElement.textContent = timeLeft;
+            const cooldownTime = parseInt(button.dataset.cooldown) || 30;
+            button.dataset.currentCooldown = cooldownTime;
+            textElement.textContent = cooldownTime;
+            button.setAttribute("data-currentCooldown", cooldownTime)
 
             const interval = setInterval(() => {
-                timeLeft--;
-                textElement.textContent = timeLeft;
+                let currentCooldown = parseInt(button.dataset.currentCooldown) || 30;
+                currentCooldown -= 1;
+                button.dataset.currentCooldown = currentCooldown;
+                textElement.textContent = currentCooldown;
 
-                if (timeLeft <= 0) {
+                if (currentCooldown <= 0) {
                     clearInterval(interval);
                     cooldownIntervals.delete(button);
                     button.classList.remove('on-cooldown');
